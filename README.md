@@ -16,10 +16,10 @@ Install the tests
 # setup the virtualenv 
 mkdir aca
 cd aca
-virtualenv aca-ex-test
-source aca-ex-test/bin/activate
+virtualenv aca-ex-test-venv
+source aca-ex-test-venv/bin/activate
 #
-git clone ...
+git clone https://github.com/RequiredHealth/aca-exchanges-test.git
 cd aca-exchanges-test
 
 ```
