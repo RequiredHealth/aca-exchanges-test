@@ -32,7 +32,7 @@ class TestState:
 
     def test_Artois_CA(self):
         #http://tools.wmflabs.org/geohack/geohack.php?pagename=Artois%2C_California&params=39_37_11_N_122_11_38_W_region:US_type:city
-	payload = {'lat': '39.619722', 'long':' -122.193889'}
+	payload = {'lat': '39.619722', 'long':'-122.193889'}
         r = requests.get(self.host + '/state', params=payload)
         # check r.status_code
         result = r.json()
