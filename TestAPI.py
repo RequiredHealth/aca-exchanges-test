@@ -34,7 +34,7 @@ class TestState:
         # check r.status_code
         result = r.json()
         assert result['state'] == 'CA'
-	assert result['county'] == 'Glenn', 'county returned is %r' % result['county']
+	assert result['county'] == 'GLENN', 'county returned is %r' % result['county']
 
     def test_state_county_CA_colusa(self):
         payload = {'lat': '39', 'long': '-122'}
@@ -42,5 +42,13 @@ class TestState:
         # check r.status_code
         result = r.json()
         assert result['state'] == 'CA'
-        assert result['county'] == 'Colusa'
+        assert result['county'] == 'COLUSA', 'county returned is %r' % result['county']
+
+    def test_state_county_TX_austin(self):
+        payload = {'lat': '30.274635', 'long': '-97.74039'}
+        r = requests.get(self.host + '/state', params=payload)
+        # check r.status_code
+        result = r.json()
+        assert result['state'] == 'CA'
+        assert result['county'] == 'BUTTE', 'county returned is %r' % result['county']
 
