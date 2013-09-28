@@ -44,11 +44,39 @@ class TestState:
         assert result['state'] == 'CA'
         assert result['county'] == 'COLUSA', 'county returned is %r' % result['county']
 
-    def test_state_county_TX_austin(self):
+    def test_state_county_TX_travis(self):
         payload = {'lat': '30.274635', 'long': '-97.74039'}
         r = requests.get(self.host + '/state', params=payload)
         # check r.status_code
         result = r.json()
         assert result['state'] == 'CA'
         assert result['county'] == 'BUTTE', 'county returned is %r' % result['county']
+
+
+
+class TestRegion:
+    host = 'http://localhost:5000'
+
+    def test_region_CA_butte(self):
+        payload = {'state': 'CA', 'county': 'BUTTE'}
+        r = requests.get(self.host + '/region', params=payload)
+        # check r.status_code
+        result = r.json()
+        assert result == 1, 'region returned is %r' % result
+
+    def test_region_CA_napa(self):
+        payload = {'state': 'ca', 'county': 'napa'}
+        r = requests.get(self.host + '/region', params=payload)
+        # check r.status_code
+        result = r.json()
+        assert result == 2, 'region returned is %r' % result
+
+    def test_region_TX_travis(self):
+        payload = {'state': 'TX', 'county': 'Travis'}
+        r = requests.get(self.host + '/region', params=payload)
+        # check r.status_code
+        result = r.json()
+        assert result['message'] == "County Travis doesn't have a matching health region", \
+            'region returned is %r' % result
+
 
