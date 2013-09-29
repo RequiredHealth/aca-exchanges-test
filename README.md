@@ -1,6 +1,3 @@
-aca-exchanges-test
-==================
-
 Assumptions
 ===========
 A working Python 2.7 environment with pip installed along with git.
