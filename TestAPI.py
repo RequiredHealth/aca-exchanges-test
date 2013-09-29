@@ -103,7 +103,6 @@ class TestPlan:
         result = r.json()
         assert result[1][0] == 'KP_BRNZ_004'
         nose.tools.assert_almost_equal(result[1][1], 261.21, places=2)
-        #assert result[0][1] == 257.350159249289, 'returned premium %r' % result[0][1]
         assert len(result) == 4, 'Got %r results' % len(result)
 
 
