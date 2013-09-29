@@ -1,8 +1,14 @@
 import requests
 import nose
 
-#_HOST_UNDER_TEST = 'http://localhost:5000'
-_HOST_UNDER_TEST = 'http://api.requiredhealth.org'
+_HOST_UNDER_TEST = ""
+
+def setup_module():
+    f = open('test_url.cfg', 'r')
+    global _HOST_UNDER_TEST
+    _HOST_UNDER_TEST = f.readline().strip()
+    f.close() 
+
 
 class TestPremium:
     def test_all_params(self):
