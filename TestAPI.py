@@ -10,6 +10,7 @@ class TestPremium:
         # check r.status_code
 	result = r.json()
 	assert result[0][0] == 'KP_CATA_015'
+        nose.tools.assert_almost_equal(result[0][1], 202.17, places=2)
         assert len(result) == 3, '%r returned' % result
 
 
