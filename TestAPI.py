@@ -11,6 +11,15 @@ def setup_module():
 
 
 class TestPremium:
+    def test_region1_age40(self):
+        payload = {'lat': '39.68', 'long': '-122.48', 'age': 40}
+        r = requests.get(_HOST_UNDER_TEST + '/premium', params=payload)
+        # check r.status_code
+        result = r.json()
+        assert result[1][0] == 'KP_BRNZ_004'
+        nose.tools.assert_almost_equal(result[1][1], 261.21, places=2)
+        assert len(result) == 4, 'Got %r results' % len(result)
+
     def test_all_params(self):
         payload = {'lat': '39.68', 'long': '-122.48', 'age': '25', 'limit':'3'}
         r = requests.get(_HOST_UNDER_TEST + '/premium', params=payload)
@@ -91,7 +100,7 @@ class TestRegion:
 
 
 class TestPlan:
-    def test_region1_age25_limit2(self):
+    def _region1_age25_limit2(self):
         payload = {'age': 25, 'region': 1, 'limit': 2}
         r = requests.get(_HOST_UNDER_TEST + '/plan', params=payload)
         # check r.status_code
@@ -100,7 +109,7 @@ class TestPlan:
         nose.tools.assert_almost_equal(result[0][1], 202.17, places=2)
         assert len(result) == 2, 'Got %r results' % len(result)
 
-    def test_region1_age40(self):
+    def _region1_age40(self):
         payload = {'age': 40, 'region': 1}
         r = requests.get(_HOST_UNDER_TEST + '/plan', params=payload)
         # check r.status_code
