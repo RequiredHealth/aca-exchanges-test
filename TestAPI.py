@@ -16,7 +16,7 @@ class TestPremium:
         r = requests.get(_HOST_UNDER_TEST + '/premium', params=payload)
         # check r.status_code
         result = r.json()
-        assert result[1][0] == 'KP_CATA_005'
+        assert result[1][0] == 'CA_KFHP_005'
         nose.tools.assert_almost_equal(result[1][1], 258.58, places=2)
         assert len(result) == 5, 'Got %r results' % len(result)
 
@@ -25,7 +25,7 @@ class TestPremium:
         r = requests.get(_HOST_UNDER_TEST + '/premium', params=payload)
         # check r.status_code
 	result = r.json()
-	assert result[0][0] == 'KP_BRNZ_015'
+	assert result[0][0] == 'CA_KFHP_015'
         nose.tools.assert_almost_equal(result[0][1], 202.17, places=2)
         assert len(result) == 3, '%r returned' % result
 
