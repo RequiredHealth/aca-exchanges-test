@@ -28,11 +28,13 @@ def getAge(id):
     return (id % 46) + 20
 
 def getPlanId(id):
-    return 'p' + str((id / 874) + 1)
+    planIds = ['p01','p02',None,'p03','p04',None,'p05','p06','p07',None]
+    #return 'p' + str((id / 874) + 1)
+    return planIds[id/874]
  
 def getRatingAreaId(id):
-    areaIds = ['r10','r15','r16','r28','r34','r40','r41','r43','r48','r49','r5',
-               'r50','r51','r52','r56','r57','r58','r6','r8']
+    areaIds = ['r10','r15','r16','r28','r34','r40','r41','r43','r48','r49','r05',
+               'r50','r51','r52','r56','r57','r58','r06','r08']
     return areaIds[(id /46) % 19]
 
 fillin_premiums = {3447: Decimal(596.00),
@@ -73,16 +75,7 @@ fillin_premiums = {3447: Decimal(596.00),
                    8235: Decimal(268.00),
                    8499: Decimal(561.00),
                    8500: Decimal(587.00),
-                   8501: Decimal(613.00),
-                   9999: Decimal(999.00),
-                   9999: Decimal(999.00),
-                   9999: Decimal(999.00),
-                   9999: Decimal(999.00),
-                   9999: Decimal(999.00),
-                   9999: Decimal(999.00),
-                   9999: Decimal(999.00),
-                   9999: Decimal(999.00),
-                   9999: Decimal(999.00)}
+                   8501: Decimal(613.00)}
 
 def getPremium(id):
     next_age = age_q.popleft()
@@ -107,29 +100,35 @@ assert getAge(45) == 65
 assert getAge(8739) == 65
 assert getAge(873) == 65
 assert getAge(874) == 20
-assert getPlanId(0) == 'p1'
-assert getPlanId(1) == 'p1'
-assert getPlanId(46) == 'p1'
+assert getPlanId(0) == 'p01'
+assert getPlanId(1) == 'p01'
+assert getPlanId(46) == 'p01'
 
-assert getPlanId(872) == 'p1' # p1,r8,a64
-assert getRatingAreaId(872) == 'r8'
+assert getPlanId(872) == 'p01' # p1,r8,a64
+assert getRatingAreaId(872) == 'r08'
 assert getAge(872) == 64
 
-assert getPlanId(873) == 'p1' # p1,r8,a65
+assert getPlanId(873) == 'p01' # p1,r8,a65
 
-assert getPlanId(874) == 'p2' # p2,r10,a20
+assert getPlanId(874) == 'p02' # p2,r10,a20
 assert getRatingAreaId(874) == 'r10'
 assert getAge(874) == 20
 
-assert getPlanId(875) == 'p2' # p2,r10,a21
+assert getPlanId(875) == 'p02' # p2,r10,a21
 assert getRatingAreaId(875) == 'r10'
 assert getAge(875) == 21
 
-assert getPlanId(8739) == 'p10'
-assert getRatingAreaId(8739) == 'r8'
+assert getPlanId(8739) == None
+assert getRatingAreaId(8739) == 'r08'
 assert getAge(8739) == 65
 
 for i in range(0, 8740):
-    print '{0},{1},{2},{3},{4}'.format(i, getPlanId(i), getRatingAreaId(i), getAge(i), getPremium(i))
+    planId = getPlanId(i)
+    areaId = getRatingAreaId(i)
+    age = getAge(i)
+    premium = getPremium(i)
+    # skip data which doesnt match an actual plan
+    if planId:
+        print '{0},{1},{2},{3},{4}'.format(i, planId, areaId, age, premium)
 
 
