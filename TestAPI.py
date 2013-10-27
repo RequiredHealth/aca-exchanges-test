@@ -17,6 +17,22 @@ def setup_module():
 
 
 class TestPremium:
+    def test_orange_county_age_46(self):
+        payload = {'lat': '33.74', 'long': '-117.88', 'age': 46}
+        r = requests.get(_HOST_UNDER_TEST + '/premium', params=payload)
+        # check r.status_code
+        result = json.loads(r.content, object_pairs_hook=OrderedDict, parse_float=Decimal)
+        assert len(result) == 6, 'Got %r results' % len(result)
+        print result
+
+    def test_la_county_age_32(self):
+        payload = {'lat': '34.07', 'long': '-118.40', 'age': 32}
+        r = requests.get(_HOST_UNDER_TEST + '/premium', params=payload)
+        # check r.status_code
+        result = json.loads(r.content, object_pairs_hook=OrderedDict, parse_float=Decimal)
+        assert len(result) == 6, 'Got %r results' % len(result)
+        print result
+
     def test_region1_age40(self):
         payload = {'lat': '39.68', 'long': '-122.48', 'age': 40}
         r = requests.get(_HOST_UNDER_TEST + '/premium', params=payload)
@@ -26,7 +42,7 @@ class TestPremium:
         #assert result[1][0] == 'CA_KFHP_005', '%r returned' % result
         nose.tools.assert_almost_equal(result[result.keys()[1]], Decimal(258.58), places=2)
         #nose.tools.assert_almost_equal(result[1][1], 258.58, places=2)
-        assert len(result) == 8, 'Got %r results' % len(result)
+        assert len(result) == 6, 'Got %r results' % len(result)
 
     def test_all_params(self):
         payload = {'lat': '39.68', 'long': '-122.48', 'age': '25', 'limit':'3'}
@@ -51,7 +67,7 @@ class TestPremium:
         r = requests.get(_HOST_UNDER_TEST + '/premium', params=payload)
         # check r.status_code
         result = r.json()
-	assert len(result) == 8, '%r returned' % result
+	assert len(result) == 6, '%r returned' % result
 
 
 
@@ -73,6 +89,23 @@ class TestState:
         assert result['state'] == 'CA'
         assert result['county'] == 'COLUSA', 'county returned is %r' % result['county']
 
+    def test_orange_county(self):
+        payload = {'lat': '33.74', 'long': '-117.88'}
+        r = requests.get(_HOST_UNDER_TEST + '/state', params=payload)
+        # check r.status_code
+        result = r.json()
+        assert result['state'] == 'CA'
+        assert result['county'] == 'ORANGE', 'county returned is %r' % result['county']
+
+    def test_la_county(self):
+        payload = {'lat': '34.07', 'long': '-118.40'}
+        r = requests.get(_HOST_UNDER_TEST + '/state', params=payload)
+        # check r.status_code
+        result = r.json()
+        assert result['state'] == 'CA'
+        assert result['county'] == 'LOS ANGELES', 'county returned is %r' % result['county']
+
+
     def test_TXStateCapitol(self):
         payload = {'lat': '30.274635', 'long': '-97.74039'}
         r = requests.get(_HOST_UNDER_TEST + '/state', params=payload)
@@ -91,6 +124,20 @@ class TestRegion:
         # check r.status_code
         result = r.json()
         assert result == 1, 'region returned is %r' % result
+
+    def test_CA_la(self):
+        payload = {'state': 'CA', 'county': 'LOS ANGELES'}
+        r = requests.get(_HOST_UNDER_TEST + '/region', params=payload)
+        # check r.status_code
+        result = r.json()
+        assert result == 16, 'region returned is %r' % result
+
+    def test_CA_orange(self):
+        payload = {'state': 'CA', 'county': 'ORANGE'}
+        r = requests.get(_HOST_UNDER_TEST + '/region', params=payload)
+        # check r.status_code
+        result = r.json()
+        assert result == 18, 'region returned is %r' % result
 
     def test_CA_napa(self):
         payload = {'state': 'ca', 'county': 'napa'}
