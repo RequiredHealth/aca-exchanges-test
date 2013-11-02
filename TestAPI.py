@@ -1,8 +1,5 @@
-# imports for managing json parsing
-from collections import OrderedDict
 from decimal import Decimal
 import json
-
 
 import requests
 import nose
@@ -21,7 +18,7 @@ class TestPremium:
         payload = {'lat': '33.74', 'long': '-117.88', 'age': 46}
         r = requests.get(_HOST_UNDER_TEST + '/premium', params=payload)
         # check r.status_code
-        result = json.loads(r.content, object_pairs_hook=OrderedDict, parse_float=Decimal)
+        result = json.loads(r.content, parse_float=Decimal)
         assert len(result) == 6, 'Got %r results' % len(result)
         print result
 
@@ -29,7 +26,7 @@ class TestPremium:
         payload = {'lat': '34.07', 'long': '-118.40', 'age': 32}
         r = requests.get(_HOST_UNDER_TEST + '/premium', params=payload)
         # check r.status_code
-        result = json.loads(r.content, object_pairs_hook=OrderedDict, parse_float=Decimal)
+        result = json.loads(r.content, parse_float=Decimal)
         assert len(result) == 6, 'Got %r results' % len(result)
         print result
 
@@ -37,22 +34,23 @@ class TestPremium:
         payload = {'lat': '39.68', 'long': '-122.48', 'age': 40}
         r = requests.get(_HOST_UNDER_TEST + '/premium', params=payload)
         # check r.status_code
-        result = json.loads(r.content, object_pairs_hook=OrderedDict, parse_float=Decimal)
-        assert result.keys()[1] == 'CA_KFHP_005', '%r returned' % result
-        #assert result[1][0] == 'CA_KFHP_005', '%r returned' % result
-        nose.tools.assert_almost_equal(result[result.keys()[1]], Decimal(258.58), places=2)
-        #nose.tools.assert_almost_equal(result[1][1], 258.58, places=2)
+        result = json.loads(r.content, parse_float=Decimal)
+        print result
+        # check 2nd result
+        assert result[1]['Insurer'] == 'CA_KFHP',  '%r returned' % result # 'CA_KFHP_005'
+        assert result[1]['Plan'] == '005', '%r returned' % result
+        nose.tools.assert_almost_equal(result[1]['Premium'], Decimal(258.58), places=2)
         assert len(result) == 6, 'Got %r results' % len(result)
 
     def test_all_params(self):
         payload = {'lat': '39.68', 'long': '-122.48', 'age': '25', 'limit':'3'}
         r = requests.get(_HOST_UNDER_TEST + '/premium', params=payload)
         # check r.status_code
-        result = json.loads(r.content, object_pairs_hook=OrderedDict, parse_float=Decimal)	
-        assert result.keys()[0] == 'CA_KFHP_015'
-        #assert result[0][0] == 'CA_KFHP_015'
-        nose.tools.assert_almost_equal(result[result.keys()[0]], Decimal(202.17), places=2)
-        #nose.tools.assert_almost_equal(result[0][1], 202.17, places=2)
+        print r.content
+        result = json.loads(r.content, parse_float=Decimal)	
+        assert result[0]['Insurer'] == 'CA_KFHP'  # 'CA_KFHP_015'
+        assert result[0]['Plan'] == '015'
+        nose.tools.assert_almost_equal(result[0]['Premium'], Decimal(202.17), places=2)
         assert len(result) == 3, '%r returned' % result
 
     def test__no_age(self):
