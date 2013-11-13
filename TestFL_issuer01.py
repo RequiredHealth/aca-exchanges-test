@@ -14,7 +14,9 @@ def setup_module():
     f.close() 
 
 def check_premium(expected_premium, actual_premium, tolerance):
-    assert abs(Decimal(expected_premium) - actual_premium) <= tolerance, \
+    diff = abs(Decimal(expected_premium) - actual_premium)
+    # check % diff is sufficiently small
+    assert diff / actual_premium <= tolerance, \
         'Tolerance breached. Actual:{} too far from Expected:{}'.format(
              actual_premium, expected_premium)
 
@@ -46,10 +48,12 @@ class TestPremium:
                 plan_name = plan_name_id_map[csv_row['plan']]
                 # print result
                 for query_row in result:
+                    print 'checking {} and {}'.format( query_row['Insurer'], query_row['Plan'])
                     if query_row['Insurer'] == 'Aetna' and \
                             query_row['Plan'] == plan_name:
                         print 'found it'
- 		        check_premium(csv_row['premium'], query_row['Premium'], 2.99)
+                        # check actual and calculated differ by < x%
+ 		        check_premium(csv_row['premium'], query_row['Premium'], 0.01)
 		        break
 		else:
 		    continue
