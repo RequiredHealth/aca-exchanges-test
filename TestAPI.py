@@ -12,6 +12,13 @@ def setup_module():
     _HOST_UNDER_TEST = f.readline().strip()
     f.close() 
 
+def check_premium(expected_premium, actual_premium, tolerance):
+    diff = abs(Decimal(expected_premium) - actual_premium)
+    # check % diff is sufficiently small
+    assert diff / actual_premium <= tolerance, \
+        'Tolerance breached. Actual:{} too far from Expected:{}'.format(
+        actual_premium, expected_premium)
+
 
 class TestPremium:
     def test_orange_county_age_46(self):
@@ -74,6 +81,20 @@ class TestPremium:
         # todo have a better way to indicate error tolerance than just place of decimals
         nose.tools.assert_almost_equal(result[0]['Premium'], Decimal(219.60), places=1)
         nose.tools.assert_almost_equal(result[105]['Premium'], Decimal(597.61), places=1)
+
+
+    # travis county
+    def test_Austin_TX_age50(self):
+        payload = {'zip':78731, 'age':50}
+        r = requests.get(_HOST_UNDER_TEST + '/zpremium', params=payload)
+        # check r.status_code
+        result = json.loads(r.content, parse_float=Decimal)
+        assert len(result) == 80, 'Got {} results'.format(len(result))
+        # todo have a better way to indicate error tolerance than just place of decimals
+        check_premium(result[0]['Premium'], Decimal(185.83), 0.01)
+        check_premium(result[79]['Premium'], Decimal(569.66), 0.01)
+
+
 
     # hillsborough county
     def test_rating_area_28_FL_age50(self):
@@ -192,9 +213,8 @@ class TestState:
         r = requests.get(_HOST_UNDER_TEST + '/state', params=payload)
         # check r.status_code
         result = r.json()
-        # returning CA/Butte for all locations outside of california right now
-        assert result['state'] == 'CA'
-        assert result['county'] == 'BUTTE', 'county returned is %r' % result['county']
+        assert result['state'] == 'TX'
+        assert result['county'] == 'TRAVIS', 'county returned is %r' % result['county']
 
 
 
