@@ -27,7 +27,7 @@ class TestPremium:
         # check r.status_code
         result = json.loads(r.content, parse_float=Decimal)
         assert len(result) == 6, 'Got %r results' % len(result)
-        print result
+        #print result
 
     def test_la_county_age_32(self):
         payload = {'lat': '34.07', 'long': '-118.40', 'age': 32}
@@ -35,14 +35,14 @@ class TestPremium:
         # check r.status_code
         result = json.loads(r.content, parse_float=Decimal)
         assert len(result) == 6, 'Got %r results' % len(result)
-        print result
+        #print result
 
     def test_region1_age40(self):
         payload = {'lat': '39.68', 'long': '-122.48', 'age': 40}
         r = requests.get(_HOST_UNDER_TEST + '/premium', params=payload)
         # check r.status_code
         result = json.loads(r.content, parse_float=Decimal)
-        print result
+        #print result
         # check 2nd result
         assert result[1]['Insurer'] == 'CA_KFHP',  '%r returned' % result # 'CA_KFHP_005'
         assert result[1]['Plan'] == '005', '%r returned' % result
@@ -59,7 +59,7 @@ class TestPremium:
         assert len(result) == 101, 'Got {} results'.format(len(result))
         nose.tools.assert_almost_equal(result[0]['Premium'], Decimal(239.59), places=1)        
         nose.tools.assert_almost_equal(result[100]['Premium'], Decimal(635.23), places=1)
-        print result
+        #print result
 
     # osceola county
     def test_Kissimmee_FL_age50_zpremium(self):
@@ -90,9 +90,24 @@ class TestPremium:
         # check r.status_code
         result = json.loads(r.content, parse_float=Decimal)
         assert len(result) == 80, 'Got {} results'.format(len(result))
-        # todo have a better way to indicate error tolerance than just place of decimals
         check_premium(result[0]['Premium'], Decimal(185.83), 0.01)
         check_premium(result[79]['Premium'], Decimal(569.66), 0.01)
+
+    def test_Boston_MA_age50(self):
+        payload = {'zip':02201, 'age':50}
+        r = requests.get(_HOST_UNDER_TEST + '/zpremium', params=payload)
+        # check r.status_code
+        assert r.status_code == 404
+
+    def test_Cedar_Rapids_IA_age50(self):
+        payload = {'zip':52401, 'age':50}
+        r = requests.get(_HOST_UNDER_TEST + '/zpremium', params=payload)
+        # check r.status_code
+        result = json.loads(r.content, parse_float=Decimal)
+        print result
+        assert len(result) == 35, 'Got {} results'.format(len(result))
+        check_premium(result[0]['Premium'], Decimal(185.83), 0.01)
+        check_premium(result[34]['Premium'], Decimal(569.66), 0.01)
 
 
 
@@ -124,7 +139,7 @@ class TestPremium:
         r = requests.get(_HOST_UNDER_TEST + '/ra_premium', params=payload)
         # check r.status_code
         result = json.loads(r.content, parse_float=Decimal)
-        print r.content
+        #print r.content
         assert len(result) == 141, 'Got {} results'.format(len(result))
         # todo have a better way to indicate error tolerance than just place of decimals
         nose.tools.assert_almost_equal(result[0]['Premium'], Decimal(185.72), places=1)
@@ -150,7 +165,7 @@ class TestPremium:
         payload = {'lat': '39.68', 'long': '-122.48', 'age': '25', 'limit':'3'}
         r = requests.get(_HOST_UNDER_TEST + '/premium', params=payload)
         # check r.status_code
-        print r.content
+        #print r.content
         result = json.loads(r.content, parse_float=Decimal)	
         assert result[0]['Insurer'] == 'CA_KFHP'  # 'CA_KFHP_015'
         assert result[0]['Plan'] == '015'
