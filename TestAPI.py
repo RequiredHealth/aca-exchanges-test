@@ -21,6 +21,12 @@ def check_premium(expected_premium, actual_premium, tolerance):
 
 
 class TestPremium:
+    # can now runs tests like
+    #    nosetest --processes=2 TestAPI.py
+    # you will only see a speed up though if the backend is run on a 
+    # multithreaded server
+    _multiprocess_shared_ = True
+
     def test_orange_county_age_46(self):
         payload = {'lat': '33.74', 'long': '-117.88', 'age': 46}
         r = requests.get(_HOST_UNDER_TEST + '/premium', params=payload)
@@ -99,22 +105,36 @@ class TestPremium:
         # check r.status_code
         assert r.status_code == 404
 
-    def test_Cedar_Rapids_IA_age50(self):
+    # Gundersen Health Plan, Inc does NOT offer plans in Linn county (rating area 6)
+    def test_Linn_county__IA_age50(self):
+        # Cedar rapids is in Linn county
         payload = {'zip':52401, 'age':50}
         r = requests.get(_HOST_UNDER_TEST + '/zpremium', params=payload)
         # check r.status_code
         result = json.loads(r.content, parse_float=Decimal)
         print result
         assert len(result) == 35, 'Got {} results'.format(len(result))
-        check_premium(result[0]['Premium'], Decimal(185.83), 0.01)
-        check_premium(result[34]['Premium'], Decimal(569.66), 0.01)
+        check_premium(result[0]['Premium'], Decimal(153.55), 0.01)
+        check_premium(result[34]['Premium'], Decimal(582.70), 0.01)
 
+    # Gundersen Health Plan, Inc does offer plans in Clayton county (rating area 6)
+    def test_Clayton_county_IA_age50(self):
+        # Elkader is in Clayton county
+        payload = {'zip':52043, 'age':50}
+        r = requests.get(_HOST_UNDER_TEST + '/zpremium', params=payload)
+        # check r.status_code
+        result = json.loads(r.content, parse_float=Decimal)
+        print result
+        assert len(result) == 46, 'Got {} results'.format(len(result))
+        check_premium(result[0]['Premium'], Decimal(193.29), 0.01)
+        check_premium(result[45]['Premium'], Decimal(710.01), 0.01)
 
 
     # hillsborough county
-    def test_rating_area_28_FL_age50(self):
-        payload = {'state': 'FL', 'rating_area' : 28, 'age' : 50}
-        r = requests.get(_HOST_UNDER_TEST + '/ra_premium', params=payload)
+    def test_Tampa_FL_age50(self):
+        # tampa
+        payload = {'zip' : 33660, 'age' : 50}
+        r = requests.get(_HOST_UNDER_TEST + '/zpremium', params=payload)
         # check r.status_code
         result = json.loads(r.content, parse_float=Decimal)
         assert len(result) == 106, 'Got {} results'.format(len(result))
@@ -134,9 +154,10 @@ class TestPremium:
         nose.tools.assert_almost_equal(result[140]['Premium'], Decimal(716.03), places=1)
  
     # miami-dade county
-    def test_rating_area_43_FL_age50(self):
-        payload = {'state' : 'FL', 'rating_area': 43, 'age':50}
-        r = requests.get(_HOST_UNDER_TEST + '/ra_premium', params=payload)
+    def test_33101_age50(self):
+        # miami
+        payload = {'zip' : 33101, 'age':50}
+        r = requests.get(_HOST_UNDER_TEST + '/zpremium', params=payload)
         # check r.status_code
         result = json.loads(r.content, parse_float=Decimal)
         #print r.content
