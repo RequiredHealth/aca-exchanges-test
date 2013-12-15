@@ -19,6 +19,7 @@ def check_premium(expected_premium, actual_premium, tolerance):
         'Tolerance breached. Actual:{} too far from Expected:{}'.format(
         actual_premium, expected_premium)
 
+FPL = 11490
 
 class TestPremium:
     # can now runs tests like
@@ -98,6 +99,80 @@ class TestPremium:
         assert len(result) == 80, 'Got {} results'.format(len(result))
         check_premium(result[0]['Premium'], Decimal(185.83), 0.01)
         check_premium(result[79]['Premium'], Decimal(569.66), 0.01)
+
+    
+
+    def test_Austin25(self):
+        payload = {'zip':78731, 'age':25, 'limit_catastrophic': True}
+        r = requests.get(_HOST_UNDER_TEST + '/zpremium', params=payload)
+        result = json.loads(r.content, parse_float=Decimal)
+        assert result[0]['Tier'] == 'Catastrophic'
+        for res in result:
+            assert res['Premium'] > Decimal(0)
+
+    def test_Austin30(self):
+        payload = {'zip':78731, 'age':30, 'limit_catastrophic': True}
+        r = requests.get(_HOST_UNDER_TEST + '/zpremium', params=payload)
+        result = json.loads(r.content, parse_float=Decimal)
+        assert result[0]['Tier'] == 'Bronze', 'Got {} expected Bronze'.format(result[0]['Tier'])
+        for res in result:
+            assert res['Premium'] > Decimal(0)
+            assert res['Tier'] != 'Catastrophic'
+
+    def test_Austin25_5xFPL(self):
+        payload = {'zip':78731, 'age':25, 'limit_catastrophic': True, 
+            'household_income': 5 * FPL, 'household_size': 1}
+        r = requests.get(_HOST_UNDER_TEST + '/zpremium', params=payload)
+        result = json.loads(r.content, parse_float=Decimal)
+        assert result[0]['Tier'] == 'Catastrophic'
+        for res in result:
+            assert res['Premium'] > Decimal(0)
+
+    def test_Austin30_5xFPL(self):
+        payload = {'zip':78731, 'age':30, 'limit_catastrophic': True,
+            'household_income': 5 * FPL, 'household_size': 1}
+        r = requests.get(_HOST_UNDER_TEST + '/zpremium', params=payload)
+        result = json.loads(r.content, parse_float=Decimal)
+        assert result[0]['Tier'] == 'Bronze', 'Got {} expected Bronze'.format(result[0]['Tier'])
+        for res in result:
+            assert res['Premium'] > Decimal(0)
+            assert res['Tier'] != 'Catastrophic'
+
+
+    def test_Austin25_1xFPL(self):
+        payload = {'zip':78731, 'age':25, 'limit_catastrophic': True,
+            'household_income': 1 * FPL, 'household_size': 1}
+        r = requests.get(_HOST_UNDER_TEST + '/zpremium', params=payload)
+        result = json.loads(r.content, parse_float=Decimal)
+        # in theory this could be silver because the are likely to be both silver
+        # and bronze plans where the premiums are zero after subsidy
+        assert result[0]['Tier'] == 'Bronze', 'Got {} expected Bronze'.format(result[0]['Tier'])
+        assert result[0]['Premium'] == Decimal(0)
+        prev_premium = -1
+        for res in result:
+            # make sure results are sorted by premium asc
+            res['Premium'] >= prev_premium
+            prev_premium == res['Premium'] 
+            if res['Tier'] == 'Catastrophic':
+                assert res['Premium'] > Decimal(0)
+
+
+    def test_Austin30_1xFPL(self):
+        payload = {'zip':78731, 'age':30, 'limit_catastrophic': True,
+            'household_income': 1 * FPL, 'household_size': 1}
+        r = requests.get(_HOST_UNDER_TEST + '/zpremium', params=payload)
+        result = json.loads(r.content, parse_float=Decimal)
+        # in theory this could be silver because the are likely to be both silver
+        # and bronze plans where the premiums are zero after subsidy
+        assert result[0]['Tier'] == 'Bronze', 'Got {} expected Bronze'.format(result[0]['Tier'])
+        assert result[0]['Premium'] == Decimal(0)
+        prev_premium = -1
+        for res in result:
+            # make sure results are sorted by premium asc
+            res['Premium'] >= prev_premium
+            prev_premium == res['Premium']
+            assert res['Tier'] != 'Catastrophic'
+
 
     def test_Boston_MA_age50(self):
         payload = {'zip':02201, 'age':50}
