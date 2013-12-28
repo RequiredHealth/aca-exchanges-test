@@ -118,6 +118,8 @@ class TestPremium:
         for res in result:
             assert res['Premium'] > Decimal(0)
             assert res['Tier'] != 'Catastrophic'
+            if res['Plan'] == 'Blue Advantage Silver HMO 003':
+                assert res['Deductible'] == 6000
 
     def test_Austin25_5xFPL(self):
         payload = {'zip':78731, 'age':25, 'limit_catastrophic': True, 
@@ -137,6 +139,8 @@ class TestPremium:
         for res in result:
             assert res['Premium'] > Decimal(0)
             assert res['Tier'] != 'Catastrophic'
+            if res['Plan'] == 'Blue Advantage Silver HMO 003':
+                assert res['Deductible'] == 6000
 
 
     def test_Austin25_1xFPL(self):
@@ -172,6 +176,42 @@ class TestPremium:
             res['Premium'] >= prev_premium
             prev_premium == res['Premium']
             assert res['Tier'] != 'Catastrophic'
+            if res['Plan'] == 'Blue Advantage Silver HMO 003':
+               assert res['Deductible'] == 500
+
+    def test_Austin30_2xFPL(self):
+        payload = {'zip':78731, 'age':30, 'limit_catastrophic': True,
+            'household_income': 2 * FPL, 'household_size': 1}
+        r = requests.get(_HOST_UNDER_TEST + '/zpremium', params=payload)
+        result = json.loads(r.content, parse_float=Decimal)
+        # in theory this could be silver because the are likely to be both silver
+        # and bronze plans where the premiums are zero after subsidy
+        for res in result:
+            if res['Plan'] == 'Blue Advantage Silver HMO 003':
+               assert res['Deductible'] == 1500
+
+
+    def test_Austin30_2pt4xFPL(self):
+        payload = {'zip':78731, 'age':30, 'limit_catastrophic': True,
+            'household_income': int(2.4 * FPL), 'household_size': 1}
+        r = requests.get(_HOST_UNDER_TEST + '/zpremium', params=payload)
+        result = json.loads(r.content, parse_float=Decimal)
+        # in theory this could be silver because the are likely to be both silver
+        # and bronze plans where the premiums are zero after subsidy
+        for res in result:
+            if res['Plan'] == 'Blue Advantage Silver HMO 003':
+               assert res['Deductible'] == 5000
+
+    def test_Austin30_pt4xFPL(self):
+        payload = {'zip':78731, 'age':30, 'limit_catastrophic': True,
+            'household_income': int(0.4 * FPL), 'household_size': 1}
+        r = requests.get(_HOST_UNDER_TEST + '/zpremium', params=payload)
+        result = json.loads(r.content, parse_float=Decimal)
+        # in theory this could be silver because the are likely to be both silver
+        # and bronze plans where the premiums are zero after subsidy
+        for res in result:
+            if res['Plan'] == 'Blue Advantage Silver HMO 003':
+               assert res['Deductible'] == 6000
 
 
     def test_Boston_MA_age50(self):
