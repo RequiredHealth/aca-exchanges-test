@@ -109,6 +109,7 @@ class TestPremium:
         assert result[0]['Tier'] == 'Catastrophic'
         for res in result:
             assert res['Premium'] > Decimal(0)
+            assert res.get('Deductible') >= 0, 'Missing deductible: {}'.format(res)
 
     def test_Austin30(self):
         payload = {'zip':78731, 'age':30, 'limit_catastrophic': True}
@@ -129,6 +130,7 @@ class TestPremium:
         assert result[0]['Tier'] == 'Catastrophic'
         for res in result:
             assert res['Premium'] > Decimal(0)
+            assert res.get('Deductible') >= 0, 'Missing deductible: {}'.format(res)
 
     def test_Austin30_5xFPL(self):
         payload = {'zip':78731, 'age':30, 'limit_catastrophic': True,
@@ -159,6 +161,7 @@ class TestPremium:
             prev_premium == res['Premium'] 
             if res['Tier'] == 'Catastrophic':
                 assert res['Premium'] > Decimal(0)
+            assert res.get('Deductible') >= 0, 'Missing deductible: {}'.format(res)
 
 
     def test_Austin30_1xFPL(self):
@@ -187,6 +190,7 @@ class TestPremium:
         # in theory this could be silver because the are likely to be both silver
         # and bronze plans where the premiums are zero after subsidy
         for res in result:
+            assert res.get('Deductible') >= 0, 'Missing deductible: {}'.format(res)
             if res['Plan'] == 'Blue Advantage Silver HMO 003':
                assert res['Deductible'] == 1500
 
@@ -199,6 +203,7 @@ class TestPremium:
         # in theory this could be silver because the are likely to be both silver
         # and bronze plans where the premiums are zero after subsidy
         for res in result:
+            assert res.get('Deductible') >= 0, 'Missing deductible: {}'.format(res)
             if res['Plan'] == 'Blue Advantage Silver HMO 003':
                assert res['Deductible'] == 5000
 
@@ -210,6 +215,7 @@ class TestPremium:
         # in theory this could be silver because the are likely to be both silver
         # and bronze plans where the premiums are zero after subsidy
         for res in result:
+            assert res.get('Deductible') >= 0, 'Missing deductible: {}'.format(res)
             if res['Plan'] == 'Blue Advantage Silver HMO 003':
                assert res['Deductible'] == 6000
 
