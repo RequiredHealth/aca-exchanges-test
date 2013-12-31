@@ -163,6 +163,104 @@ class TestPremium:
                 assert res['Premium'] > Decimal(0)
             assert res.get('Deductible') >= 0, 'Missing deductible: {}'.format(res)
 
+    def test_CentralTexas25_1xFPL(self):
+        # Travis county
+        payload = {'zip':78731, 'age':25, 'limit_catastrophic': True,
+            'household_income': 1 * FPL, 'household_size': 1}
+        r = requests.get(_HOST_UNDER_TEST + '/zpremium', params=payload)
+        result = json.loads(r.content, parse_float=Decimal)
+        for res in result:
+            assert res.get('Deductible') >= 0, 'Missing deductible: {}'.format(res)
+
+        # Bastrop county
+        payload = {'zip':78602, 'age':25, 'limit_catastrophic': True,
+            'household_income': 1 * FPL, 'household_size': 1}
+        r = requests.get(_HOST_UNDER_TEST + '/zpremium', params=payload)
+        result = json.loads(r.content, parse_float=Decimal)
+        for res in result:
+            assert res.get('Deductible') >= 0, 'Missing deductible: {}'.format(res)
+
+        # Blanco county
+        payload = {'zip':78070, 'age':25, 'limit_catastrophic': True,
+            'household_income': 1 * FPL, 'household_size': 1}
+        r = requests.get(_HOST_UNDER_TEST + '/zpremium', params=payload)
+        result = json.loads(r.content, parse_float=Decimal)
+        for res in result:
+            assert res.get('Deductible') >= 0, 'Missing deductible: {}'.format(res)
+
+        # Burnet county
+        payload = {'zip':73301, 'age':25, 'limit_catastrophic': True,
+            'household_income': 1 * FPL, 'household_size': 1}
+        r = requests.get(_HOST_UNDER_TEST + '/zpremium', params=payload)
+        result = json.loads(r.content, parse_float=Decimal)
+        for res in result:
+            assert res.get('Deductible') >= 0, 'Missing deductible: {}'.format(res)
+
+        # Caldwell county
+        payload = {'zip':78610, 'age':25, 'limit_catastrophic': True,
+            'household_income': 1 * FPL, 'household_size': 1}
+        r = requests.get(_HOST_UNDER_TEST + '/zpremium', params=payload)
+        result = json.loads(r.content, parse_float=Decimal)
+        for res in result:
+            assert res.get('Deductible') >= 0, 'Missing deductible: {}'.format(res)
+
+        # Comal county
+        payload = {'zip':78602, 'age':25, 'limit_catastrophic': True,
+            'household_income': 1 * FPL, 'household_size': 1}
+        r = requests.get(_HOST_UNDER_TEST + '/zpremium', params=payload)
+        result = json.loads(r.content, parse_float=Decimal)
+        for res in result:
+            assert res.get('Deductible') >= 0, 'Missing deductible: {}'.format(res)
+
+
+        # Williamson county
+        payload = {'zip':78646, 'age':25, 'limit_catastrophic': True,
+            'household_income': 1 * FPL, 'household_size': 1}
+        r = requests.get(_HOST_UNDER_TEST + '/zpremium', params=payload)
+        result = json.loads(r.content, parse_float=Decimal)
+        for res in result:
+            assert res.get('Deductible') >= 0, 'Missing deductible: {}'.format(res)
+
+        # Fayette county
+        payload = {'zip':78932, 'age':25, 'limit_catastrophic': True,
+            'household_income': 1 * FPL, 'household_size': 1}
+        r = requests.get(_HOST_UNDER_TEST + '/zpremium', params=payload)
+        result = json.loads(r.content, parse_float=Decimal)
+        for res in result:
+            assert res.get('Deductible') >= 0, 'Missing deductible: {}'.format(res)
+
+        # Gillespie county
+        payload = {'zip':76856, 'age':25, 'limit_catastrophic': True,
+            'household_income': 1 * FPL, 'household_size': 1}
+        r = requests.get(_HOST_UNDER_TEST + '/zpremium', params=payload)
+        result = json.loads(r.content, parse_float=Decimal)
+        for res in result:
+            assert res.get('Deductible') >= 0, 'Missing deductible: {}'.format(res)
+
+        # Hays county
+        payload = {'zip':78620, 'age':25, 'limit_catastrophic': True,
+            'household_income': 1 * FPL, 'household_size': 1}
+        r = requests.get(_HOST_UNDER_TEST + '/zpremium', params=payload)
+        result = json.loads(r.content, parse_float=Decimal)
+        for res in result:
+            assert res.get('Deductible') >= 0, 'Missing deductible: {}'.format(res)
+
+        # Lee county
+        payload = {'zip':76578, 'age':25, 'limit_catastrophic': True,
+            'household_income': 1 * FPL, 'household_size': 1}
+        r = requests.get(_HOST_UNDER_TEST + '/zpremium', params=payload)
+        result = json.loads(r.content, parse_float=Decimal)
+        for res in result:
+            assert res.get('Deductible') >= 0, 'Missing deductible: {}'.format(res)
+
+        # Llano county
+        payload = {'zip':76831, 'age':25, 'limit_catastrophic': True,
+            'household_income': 1 * FPL, 'household_size': 1}
+        r = requests.get(_HOST_UNDER_TEST + '/zpremium', params=payload)
+        result = json.loads(r.content, parse_float=Decimal)
+        for res in result:
+            assert res.get('Deductible') >= 0, 'Missing deductible: {}'.format(res)
+
 
     def test_Austin30_1xFPL(self):
         payload = {'zip':78731, 'age':30, 'limit_catastrophic': True,
