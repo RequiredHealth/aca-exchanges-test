@@ -7,17 +7,21 @@ import nose
 _HOST_UNDER_TEST = ""
 
 def setup_module():
-    f = open('test_url.cfg', 'r')
     global _HOST_UNDER_TEST
-    _HOST_UNDER_TEST = f.readline().strip()
-    f.close() 
+    with open('test_url.cfg', 'r') as f:
+        for line in f:
+            if line.startswith('#'):
+	        continue
+            else:
+                _HOST_UNDER_TEST = line.strip()
+                break
 
-def check_premium(expected_premium, actual_premium, tolerance):
+def check_premium(expected_premium, actual_premium, percent_tolerance=Decimal('0.0001')):
     diff = abs(Decimal(expected_premium) - actual_premium)
     # check % diff is sufficiently small
-    assert diff / actual_premium <= tolerance, \
-        'Tolerance breached. Actual:{} too far from Expected:{}'.format(
-        actual_premium, expected_premium)
+    assert diff / actual_premium <= percent_tolerance, \
+        'Tolerance ({}) breached. Actual:{} too far from Expected:{}'.format(
+        percent_tolerance * actual_premium, actual_premium, expected_premium)
 
 FPL = 11490
 
@@ -64,8 +68,8 @@ class TestPremium:
         # check r.status_code
         result = json.loads(r.content, parse_float=Decimal)
         assert len(result) == 101, 'Got {} results'.format(len(result))
-        nose.tools.assert_almost_equal(result[0]['Premium'], Decimal(239.59), places=1)        
-        nose.tools.assert_almost_equal(result[100]['Premium'], Decimal(635.23), places=1)
+        check_premium(result[0]['Premium'], Decimal('239.59'))        
+        check_premium(result[100]['Premium'], Decimal('635.23'))
         #print result
 
     # osceola county
@@ -75,8 +79,8 @@ class TestPremium:
         # check r.status_code
         result = json.loads(r.content, parse_float=Decimal)
         assert len(result) == 101, 'Got {} results'.format(len(result))
-        nose.tools.assert_almost_equal(result[0]['Premium'], Decimal(239.59), places=1)
-        nose.tools.assert_almost_equal(result[100]['Premium'], Decimal(635.23), places=1)
+        check_premium(result[0]['Premium'], Decimal('239.59'))
+        check_premium(result[100]['Premium'], Decimal('635.23'))
 
     # hillsborough county
     def test_Tampa_FL_age50(self):
@@ -85,9 +89,8 @@ class TestPremium:
         # check r.status_code
         result = json.loads(r.content, parse_float=Decimal)
         assert len(result) == 106, 'Got {} results'.format(len(result))
-        # todo have a better way to indicate error tolerance than just place of decimals
-        nose.tools.assert_almost_equal(result[0]['Premium'], Decimal(219.60), places=1)
-        nose.tools.assert_almost_equal(result[105]['Premium'], Decimal(597.61), places=1)
+        check_premium(result[0]['Premium'], Decimal('219.60'))
+        check_premium(result[105]['Premium'], Decimal('597.61'))
 
 
     # travis county
@@ -97,8 +100,8 @@ class TestPremium:
         # check r.status_code
         result = json.loads(r.content, parse_float=Decimal)
         assert len(result) == 80, 'Got {} results'.format(len(result))
-        check_premium(result[0]['Premium'], Decimal(185.83), 0.01)
-        check_premium(result[79]['Premium'], Decimal(569.66), 0.01)
+        check_premium(result[0]['Premium'], Decimal('185.83'))
+        check_premium(result[79]['Premium'], Decimal('569.66'))
 
     
 
@@ -160,7 +163,7 @@ class TestPremium:
             res['Premium'] >= prev_premium
             prev_premium == res['Premium'] 
             if res['Tier'] == 'Catastrophic':
-                assert res['Premium'] > Decimal(0)
+                assert res['Premium'] > Decimal('0')
             assert res.get('Deductible') >= 0, 'Missing deductible: {}'.format(res)
 
     def test_CentralTexas25_1xFPL(self):
@@ -333,8 +336,8 @@ class TestPremium:
         result = json.loads(r.content, parse_float=Decimal)
         print result
         assert len(result) == 35, 'Got {} results'.format(len(result))
-        check_premium(result[0]['Premium'], Decimal(153.55), 0.01)
-        check_premium(result[34]['Premium'], Decimal(582.70), 0.01)
+        check_premium(result[0]['Premium'], Decimal('153.55'))
+        check_premium(result[34]['Premium'], Decimal('582.70'))
 
     # Gundersen Health Plan, Inc does offer plans in Clayton county (rating area 6)
     def test_Clayton_county_IA_age50(self):
@@ -345,8 +348,8 @@ class TestPremium:
         result = json.loads(r.content, parse_float=Decimal)
         print result
         assert len(result) == 46, 'Got {} results'.format(len(result))
-        check_premium(result[0]['Premium'], Decimal(193.29), 0.01)
-        check_premium(result[45]['Premium'], Decimal(710.01), 0.01)
+        check_premium(result[0]['Premium'], Decimal('193.29'))
+        check_premium(result[45]['Premium'], Decimal('710.01'))
 
 
     # hillsborough county
@@ -358,20 +361,22 @@ class TestPremium:
         result = json.loads(r.content, parse_float=Decimal)
         assert len(result) == 106, 'Got {} results'.format(len(result))
         # todo have a better way to indicate error tolerance than just place of decimals
-        nose.tools.assert_almost_equal(result[0]['Premium'], Decimal(219.60), places=1)
-        nose.tools.assert_almost_equal(result[105]['Premium'], Decimal(597.61), places=1)
-  
+        check_premium(result[0]['Premium'], Decimal('219.60'))
+        check_premium(result[105]['Premium'], Decimal('597.61'))
+
+#dupe  
     # miami-dade county
-    def test_coconut_grove_FL(self):
-        payload = {'zip':33133, 'age':50}
-        r = requests.get(_HOST_UNDER_TEST + '/zpremium', params=payload)
-        # check r.status_code
-        result = json.loads(r.content, parse_float=Decimal)
-        assert len(result) == 141, 'Got {} results'.format(len(result))
-        # todo have a better way to indicate error tolerance than just place of decimals
-        nose.tools.assert_almost_equal(result[0]['Premium'], Decimal(185.72), places=1)
-        nose.tools.assert_almost_equal(result[140]['Premium'], Decimal(716.03), places=1)
+#    def test_coconut_grove_FL(self):
+#        payload = {'zip':33133, 'age':50}
+#        r = requests.get(_HOST_UNDER_TEST + '/zpremium', params=payload)
+#        # check r.status_code
+#        result = json.loads(r.content, parse_float=Decimal)
+#        assert len(result) == 141, 'Got {} results'.format(len(result))
+#        # todo have a better way to indicate error tolerance than just place of decimals
+#        nose.tools.assert_almost_equal(result[0]['Premium'], Decimal(185.72), places=1)
+#        nose.tools.assert_almost_equal(result[140]['Premium'], Decimal(716.03), places=1)
  
+
     # miami-dade county
     def test_33101_age50(self):
         # miami
@@ -382,8 +387,8 @@ class TestPremium:
         #print r.content
         assert len(result) == 141, 'Got {} results'.format(len(result))
         # todo have a better way to indicate error tolerance than just place of decimals
-        nose.tools.assert_almost_equal(result[0]['Premium'], Decimal(185.72), places=1)
-        nose.tools.assert_almost_equal(result[140]['Premium'], Decimal(716.03), places=1)
+        check_premium(result[0]['Premium'], Decimal('185.72'))
+        check_premium(result[140]['Premium'], Decimal('716.03'))
 
 
 
