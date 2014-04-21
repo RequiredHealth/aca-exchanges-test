@@ -16,12 +16,12 @@ def setup_module():
                 _HOST_UNDER_TEST = line.strip()
                 break
 
-def check_premium(expected_premium, actual_premium, percent_tolerance=Decimal('0.0001')):
-    diff = abs(Decimal(expected_premium) - actual_premium)
+def check_premium(calculated_premium, expected_premium, percent_tolerance=Decimal('0.0001')):
+    diff = abs(Decimal(calculated_premium) - expected_premium)
     # check % diff is sufficiently small
-    assert diff / actual_premium <= percent_tolerance, \
-        'Tolerance ({}) breached. Actual:{} too far from Expected:{}'.format(
-        percent_tolerance * actual_premium, actual_premium, expected_premium)
+    assert diff / expected_premium <= percent_tolerance, \
+        'Tolerance ({}) breached. Calculated:{} too far from Expected:{}'.format(
+        percent_tolerance * expected_premium, calculated_premium, expected_premium)
 
 FPL = 11490
 
@@ -100,7 +100,7 @@ class TestPremium:
         # check r.status_code
         result = json.loads(r.content, parse_float=Decimal)
         assert len(result) == 80, 'Got {} results'.format(len(result))
-        check_premium(result[0]['Premium'], Decimal('185.83'))
+        check_premium(result[0]['Premium'], Decimal('185.83'), Decimal('0.0005'))
         check_premium(result[79]['Premium'], Decimal('569.66'))
 
     
@@ -348,7 +348,7 @@ class TestPremium:
         result = json.loads(r.content, parse_float=Decimal)
         print result
         assert len(result) == 46, 'Got {} results'.format(len(result))
-        check_premium(result[0]['Premium'], Decimal('193.29'))
+        check_premium(result[0]['Premium'], Decimal('193.29'), Decimal('0.0005'))
         check_premium(result[45]['Premium'], Decimal('710.01'))
 
 

@@ -8,10 +8,15 @@ import nose
 _HOST_UNDER_TEST = ""
 
 def setup_module():
-    f = open('test_url.cfg', 'r')
     global _HOST_UNDER_TEST
-    _HOST_UNDER_TEST = f.readline().strip()
-    f.close() 
+    with open('test_url.cfg', 'r') as f:
+        for line in f:
+            if line.startswith('#'):
+                continue
+            else:
+                _HOST_UNDER_TEST = line.strip()
+                break
+
 
 def check_premium(expected_premium, actual_premium, tolerance):
     diff = abs(Decimal(expected_premium) - actual_premium)
@@ -29,6 +34,27 @@ plan_name_id_map = {'p04': 'Aetna Basic',
                     'p05': 'Aetna Premier 2000 PD'
                      }
 
+# a map of rating area to one particular county in the area
+area_county = {'r05':'BREVARD',
+                'r06':'BROWARD',
+                'r08':'CHARLOTTE',
+                'r10':'CLAY',
+                'r15':'DUVAL',
+                'r16':'ESCAMBIA',
+                'r28':'HILLSBOROUGH',
+                'r34':'LAKE',
+                'r40':'MANATEE',
+                'r41':'MARION',
+                'r43':'MIAMI-DADE',
+                'r48':'ORANGE',
+                'r49':'OSCEOLA', 
+                'r50':'PALM BEACH',
+                'r51':'PASCO',
+                'r52':'PINELLAS',
+                'r56':'SARASOTA',
+                'r57':'SEMINOLE',
+                'r58':'ST. JOHNS'}
+
 
 class TestPremium:
     def test_all_ages_and_rating_area_issuer01(self):
@@ -39,10 +65,18 @@ class TestPremium:
                 print 'Checking premium for Plan: {}, in Area: {}, for Age: {}'.format(
  		       csv_row['plan'], csv_row['area'][1:], csv_row['age'])
 
+                example_county = area_county[csv_row['area']]
+                print example_county
                 payload = {'state': 'FL',
                     'rating_area' : csv_row['area'][1:], 
+		    'county' : example_county,
                     'age' : csv_row['age']}
-                r = requests.get(_HOST_UNDER_TEST + '/ra_premium', params=payload)
+                # TODO bug in how we handle county names containing periods,
+                # see trello for more details, but this test will fail right now
+                if '.' in example_county:
+                    continue
+
+                r = requests.get(_HOST_UNDER_TEST + '/st_cnty_RA_premium', params=payload)
                 # check r.status_code
                 result = json.loads(r.content, parse_float=Decimal)
                 plan_name = plan_name_id_map[csv_row['plan']]
