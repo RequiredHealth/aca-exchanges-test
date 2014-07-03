@@ -9,11 +9,13 @@ echo $@
 # set up ssh keys for making git usage easier
 # assume ~/.ssh on the host is mounted at /root/.ssh_host in the container
 # for some reason cant mount stuff directly into /root/.ssh
-mkdir /root/.ssh
-# only need the private key
-cp /root/.ssh_host/id_rsa /root/.ssh/id_rsa
-# give it the right restrictive permissions
-chmod 600 /root/.ssh/id_rsa
+if [[ ! -f /root/.ssh/id_rsa ]];then
+    mkdir /root/.ssh
+    # only need the private key
+    cp /root/.ssh_host/id_rsa /root/.ssh/id_rsa
+    # give it the right restrictive permissions
+    chmod 600 /root/.ssh/id_rsa
+fi
 
 if [[ -n  "$1" && -n "$2" ]];then
     # two command line args, assume they are git related
