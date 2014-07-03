@@ -1,7 +1,6 @@
 #!/bin/bash
 set -ex
 
-
 # assumes this container has been linked to another container where the api is running
 # and the alias 'acaex_api' was used. Also that api container exposes port 5001
 export ACAEX_TEST_URL=http://$ACAEX_API_PORT_5001_TCP_ADDR:$ACAEX_API_PORT_5001_TCP_PORT
