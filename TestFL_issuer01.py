@@ -9,14 +9,7 @@ _HOST_UNDER_TEST = ""
 
 def setup_module():
     global _HOST_UNDER_TEST
-    with open('test_url.cfg', 'r') as f:
-        for line in f:
-            if line.startswith('#'):
-                continue
-            else:
-                _HOST_UNDER_TEST = line.strip()
-                break
-
+    _HOST_UNDER_TEST = os.getenv('ACAEX_TEST_URL', 'http://localhost:5001')
 
 def check_premium(expected_premium, actual_premium, tolerance):
     diff = abs(Decimal(expected_premium) - actual_premium)

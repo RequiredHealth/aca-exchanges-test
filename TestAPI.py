@@ -11,14 +11,6 @@ def setup_module():
     global _HOST_UNDER_TEST
     _HOST_UNDER_TEST = os.getenv('ACAEX_TEST_URL', 'http://localhost:5001')
 
-#    with open('test_url.cfg', 'r') as f:
- #       for line in f:
-  #          if line.startswith('#'):
-#	        continue
- #           else:
-  #              _HOST_UNDER_TEST = line.strip()
-   #             break
-
 def check_premium(calculated_premium, expected_premium, percent_tolerance=Decimal('0.0001')):
     diff = abs(Decimal(calculated_premium) - expected_premium)
     # check % diff is sufficiently small
