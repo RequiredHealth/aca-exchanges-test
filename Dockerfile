@@ -7,5 +7,5 @@ WORKDIR /acaex-test
 
 RUN pip install -r requirements.txt
 
-ENTRYPOINT ["start.sh"]
+ENTRYPOINT ["./start.sh"]
 
