@@ -19,11 +19,9 @@ fi
 
 if [[ -n  "$1" && -n "$2" ]];then
     # two command line args, assume they are git related
-    # TODO check if this cd is necessary given WORKDIR
-    # is set to the repo folder in the Dockerfile, 
-    # try going to /tmp, stopping the container and starting it again
-    cd /acaex-test
+    git config --local --unset-all user.name
     git config --local --add user.name "$1"
+    git config --local --unset-all user.email
     git config --local --add user.email "$2"
 fi
 
