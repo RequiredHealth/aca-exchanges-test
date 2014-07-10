@@ -17,8 +17,8 @@ if [[ ! -f /root/.ssh/id_rsa ]];then
     chmod 600 /root/.ssh/id_rsa
 fi
 
-# two more command line args, assume they are git related
-if [[ -n "$2" && -n "$3" ]];then
+# two command line args, assume they are git related
+if [[ -n "$1" && -n "$2" ]];then
     # only try to clear out settings if they exist
     # --unset will return non-zero and so fail the script
     # setting is not present
@@ -28,8 +28,8 @@ if [[ -n "$2" && -n "$3" ]];then
     if [[ -n `git config --local user.email` ]];then
         git config --local --unset user.email
     fi
-    git config --local --add user.name "$2"
-    git config --local --add user.email "$3"
+    git config --local --add user.name "$1"
+    git config --local --add user.email "$2"
 fi
 
 # finally startup the bash console which will be the process
