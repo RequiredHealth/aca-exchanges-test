@@ -1,5 +1,5 @@
 # basic dockerfile for containerizing acaex-test repo
-FROM eggtree/ub12:base
+FROM eggtree/base
 
 #Expects the acadata repo to have already been cloned on the host
 ADD .  /acaex-test
